@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import cn.huntercat.lieshou.framework.domain.User;
-import cn.huntercat.lieshou.framework.domain.Tenant;
 import cn.huntercat.lieshou.framework.domain.Role;
-import cn.huntercat.lieshou.framework.domain.UserRepository;
-import cn.huntercat.lieshou.framework.domain.TenantRepository;
 import cn.huntercat.lieshou.framework.domain.RoleRepository;
+import cn.huntercat.lieshou.framework.domain.Tenant;
+import cn.huntercat.lieshou.framework.domain.TenantRepository;
+import cn.huntercat.lieshou.framework.domain.User;
+import cn.huntercat.lieshou.framework.domain.UserRepository;
 import cn.huntercat.lieshoucloudpro.user.PostgresTestSupport;
 
 /**

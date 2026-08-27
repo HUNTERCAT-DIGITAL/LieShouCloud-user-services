@@ -4,8 +4,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
@@ -25,7 +23,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
  *   <li>{@link OpenAPIDefinition} —— Phase 5 SpringDoc 元信息；前端 openapi-typescript 用此生成 typed client
  * </ul>
  */
-@SpringBootApplication(scanBasePackages = {"cn.huntercat.lieshoucloudpro", "cn.huntercat.lieshou.framework"})
+@SpringBootApplication(
+    scanBasePackages = {"cn.huntercat.lieshoucloudpro", "cn.huntercat.lieshou.framework"})
 @EntityScan(basePackages = "cn.huntercat.lieshou.framework.domain")
 @EnableJpaRepositories(basePackages = "cn.huntercat.lieshou.framework.domain")
 @EnableDiscoveryClient

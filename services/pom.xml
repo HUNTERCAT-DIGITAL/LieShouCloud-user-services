@@ -13,7 +13,6 @@
     <description>LieShouCloud open-source core services parent</description>
 
     <modules>
-        <module>common/services</module>
         <module>user</module>
     </modules>
 
@@ -147,12 +146,6 @@
                 <scope>runtime</scope>
             </dependency>
 
-            <!-- 底座共享模块（L2-1 · Bottom-Up）：统一异常体契约 -->
-            <dependency>
-                <groupId>cn.huntercat</groupId>
-                <artifactId>lieshoucloud-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <!-- JWT 共享模块（HS256 单一事实源 · auth 签发 / gateway 验证） -->
             <dependency>
                 <groupId>cn.huntercat</groupId>

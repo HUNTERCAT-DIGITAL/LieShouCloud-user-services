@@ -15,7 +15,6 @@ import jakarta.validation.constraints.NotBlank;
 
 import cn.huntercat.lieshou.framework.common.audit.Audited;
 import cn.huntercat.lieshou.framework.common.security.RequiresPermission;
-import cn.huntercat.lieshou.framework.service.AuditService;
 import cn.huntercat.lieshou.framework.domain.Role;
 import cn.huntercat.lieshou.framework.domain.RoleRepository;
 import io.swagger.v3.oas.annotations.Operation;

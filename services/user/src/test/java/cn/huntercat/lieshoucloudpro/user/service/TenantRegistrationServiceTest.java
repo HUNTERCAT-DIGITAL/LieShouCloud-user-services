@@ -16,13 +16,13 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import cn.huntercat.lieshou.framework.service.TenantRegistrationService;
 import cn.huntercat.lieshou.framework.domain.Role;
 import cn.huntercat.lieshou.framework.domain.RoleRepository;
 import cn.huntercat.lieshou.framework.domain.Tenant;
 import cn.huntercat.lieshou.framework.domain.TenantRepository;
 import cn.huntercat.lieshou.framework.domain.User;
 import cn.huntercat.lieshou.framework.domain.UserRepository;
+import cn.huntercat.lieshou.framework.service.TenantRegistrationService;
 import java.util.Optional;
 
 /**
@@ -43,7 +43,12 @@ class TenantRegistrationServiceTest {
 
   @BeforeEach
   void setUp() {
-    service = new TenantRegistrationService(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(), tenants, users, roles);
+    service =
+        new TenantRegistrationService(
+            new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(),
+            tenants,
+            users,
+            roles);
     lenient().when(tenants.save(any(Tenant.class))).thenAnswer(inv -> inv.getArgument(0));
     lenient().when(users.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
     Role admin = new Role("TENANT_ADMIN", "租户管理员", null, null, true);
