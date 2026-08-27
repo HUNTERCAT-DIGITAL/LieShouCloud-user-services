@@ -9,9 +9,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import cn.huntercat.lieshou.framework.domain.AuditLog;
+import cn.huntercat.lieshou.framework.domain.User;
+import cn.huntercat.lieshou.framework.domain.AuditLogRepository;
+import cn.huntercat.lieshou.framework.domain.UserRepository;
 import cn.huntercat.lieshoucloudpro.user.PostgresTestSupport;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLog.Action;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLog.Outcome;
+import cn.huntercat.lieshou.framework.domain.AuditLog.Action;
+import cn.huntercat.lieshou.framework.domain.AuditLog.Outcome;
 
 /**
  * AuditLog 仓库切片测试（append-only · DATA_SECURITY §7）.

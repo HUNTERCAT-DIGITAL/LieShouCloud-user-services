@@ -15,8 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import cn.huntercat.lieshoucloudpro.user.PostgresTestSupport;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLog;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLogRepository;
+import cn.huntercat.lieshou.framework.domain.AuditLog;
+import cn.huntercat.lieshou.framework.domain.AuditLogRepository;
 import java.util.List;
 
 /**

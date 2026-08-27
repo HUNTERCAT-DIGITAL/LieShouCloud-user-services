@@ -1,6 +1,6 @@
 package cn.huntercat.lieshoucloudpro.user.service;
 
-import cn.huntercat.lieshoucloudpro.user.domain.VerificationCode;
+import cn.huntercat.lieshou.framework.domain.VerificationCode;
 
 /**
  * 验证码发送器抽象（ADR-0023）.

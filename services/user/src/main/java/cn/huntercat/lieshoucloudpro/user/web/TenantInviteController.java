@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 import cn.huntercat.lieshou.framework.common.web.TenantHeaders;
-import cn.huntercat.lieshoucloudpro.user.domain.TenantInvite;
-import cn.huntercat.lieshoucloudpro.user.domain.TenantInviteRepository;
-import cn.huntercat.lieshoucloudpro.user.domain.TenantRepository;
+import cn.huntercat.lieshou.framework.domain.TenantInvite;
+import cn.huntercat.lieshou.framework.domain.TenantInviteRepository;
+import cn.huntercat.lieshou.framework.domain.TenantRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

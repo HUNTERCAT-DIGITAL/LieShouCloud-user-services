@@ -13,8 +13,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cn.huntercat.lieshou.framework.common.audit.AuditEvent;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLog;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLogRepository;
+import cn.huntercat.lieshou.framework.domain.AuditLog;
+import cn.huntercat.lieshou.framework.domain.AuditLogRepository;
 import java.time.Instant;
 
 /** AuditService 实现 AuditRecorder SPI 的适配测试（L2-1 审计注解接入）. */

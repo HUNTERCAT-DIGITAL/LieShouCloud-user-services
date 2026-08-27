@@ -16,8 +16,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import cn.huntercat.lieshoucloudpro.common.web.TenantHeaders;
-import cn.huntercat.lieshoucloudpro.user.domain.Notification;
+import cn.huntercat.lieshou.framework.common.web.TenantHeaders;
+import cn.huntercat.lieshou.framework.domain.Notification;
 import cn.huntercat.lieshoucloudpro.user.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

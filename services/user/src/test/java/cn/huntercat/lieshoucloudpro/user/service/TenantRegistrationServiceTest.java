@@ -16,12 +16,12 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import cn.huntercat.lieshoucloudpro.user.domain.Role;
-import cn.huntercat.lieshoucloudpro.user.domain.RoleRepository;
-import cn.huntercat.lieshoucloudpro.user.domain.Tenant;
-import cn.huntercat.lieshoucloudpro.user.domain.TenantRepository;
-import cn.huntercat.lieshoucloudpro.user.domain.User;
-import cn.huntercat.lieshoucloudpro.user.domain.UserRepository;
+import cn.huntercat.lieshou.framework.domain.Role;
+import cn.huntercat.lieshou.framework.domain.RoleRepository;
+import cn.huntercat.lieshou.framework.domain.Tenant;
+import cn.huntercat.lieshou.framework.domain.TenantRepository;
+import cn.huntercat.lieshou.framework.domain.User;
+import cn.huntercat.lieshou.framework.domain.UserRepository;
 import java.util.Optional;
 
 /**

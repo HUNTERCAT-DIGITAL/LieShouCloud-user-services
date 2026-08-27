@@ -3,8 +3,8 @@ package cn.huntercat.lieshoucloudpro.user.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.huntercat.lieshoucloudpro.user.domain.VerificationCode;
-import cn.huntercat.lieshoucloudpro.user.domain.VerificationCodeRepository;
+import cn.huntercat.lieshou.framework.domain.VerificationCode;
+import cn.huntercat.lieshou.framework.domain.VerificationCodeRepository;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;

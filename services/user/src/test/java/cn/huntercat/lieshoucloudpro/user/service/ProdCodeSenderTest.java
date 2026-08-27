@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import cn.huntercat.lieshoucloudpro.user.domain.VerificationCode;
+import cn.huntercat.lieshou.framework.domain.VerificationCode;
 
 /** ProdCodeSender 通道分发单元测试（SMS → 阿里云 / EMAIL → SMTP）. */
 @DisplayName("ProdCodeSender（生产通道分发）")

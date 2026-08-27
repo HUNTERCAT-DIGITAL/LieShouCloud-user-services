@@ -3,8 +3,8 @@ package cn.huntercat.lieshoucloudpro.user.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.huntercat.lieshoucloudpro.user.domain.Notification;
-import cn.huntercat.lieshoucloudpro.user.domain.NotificationRepository;
+import cn.huntercat.lieshou.framework.domain.Notification;
+import cn.huntercat.lieshou.framework.domain.NotificationRepository;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;

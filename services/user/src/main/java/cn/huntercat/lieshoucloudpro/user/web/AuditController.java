@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.huntercat.lieshou.framework.common.web.TenantHeaders;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLog;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLog.Action;
-import cn.huntercat.lieshoucloudpro.user.domain.AuditLogRepository;
+import cn.huntercat.lieshou.framework.domain.AuditLog;
+import cn.huntercat.lieshou.framework.domain.AuditLog.Action;
+import cn.huntercat.lieshou.framework.domain.AuditLogRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

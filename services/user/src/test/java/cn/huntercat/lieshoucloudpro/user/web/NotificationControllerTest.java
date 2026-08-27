@@ -19,8 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import cn.huntercat.lieshoucloudpro.user.PostgresTestSupport;
-import cn.huntercat.lieshoucloudpro.user.domain.Notification;
-import cn.huntercat.lieshoucloudpro.user.domain.NotificationRepository;
+import cn.huntercat.lieshou.framework.domain.Notification;
+import cn.huntercat.lieshou.framework.domain.NotificationRepository;
 import java.time.Instant;
 import java.util.List;
 

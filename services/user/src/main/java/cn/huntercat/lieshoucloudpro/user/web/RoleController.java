@@ -15,8 +15,8 @@ import jakarta.validation.constraints.NotBlank;
 
 import cn.huntercat.lieshou.framework.common.audit.Audited;
 import cn.huntercat.lieshou.framework.common.security.RequiresPermission;
-import cn.huntercat.lieshoucloudpro.user.domain.Role;
-import cn.huntercat.lieshoucloudpro.user.domain.RoleRepository;
+import cn.huntercat.lieshou.framework.domain.Role;
+import cn.huntercat.lieshou.framework.domain.RoleRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;

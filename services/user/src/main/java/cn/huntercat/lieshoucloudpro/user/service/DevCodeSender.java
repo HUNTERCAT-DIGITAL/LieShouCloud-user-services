@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.huntercat.lieshoucloudpro.user.domain.VerificationCode;
+import cn.huntercat.lieshou.framework.domain.VerificationCode;
 
 /**
  * dev 验证码发送器：打印到日志（生产接入阿里云短信 / SMTP 后替换）.
