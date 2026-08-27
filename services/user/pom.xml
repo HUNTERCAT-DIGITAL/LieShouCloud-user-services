@@ -20,6 +20,10 @@
             <groupId>cn.huntercat</groupId>
             <artifactId>framework-domain</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.huntercat</groupId>
+            <artifactId>framework-service</artifactId>
+        </dependency>
         <!-- Web（MVC） -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

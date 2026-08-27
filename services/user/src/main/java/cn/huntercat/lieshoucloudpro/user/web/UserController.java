@@ -24,7 +24,7 @@ import cn.huntercat.lieshou.framework.domain.TenantInviteRepository;
 import cn.huntercat.lieshou.framework.domain.TenantRepository;
 import cn.huntercat.lieshou.framework.domain.User;
 import cn.huntercat.lieshou.framework.domain.UserRepository;
-import cn.huntercat.lieshoucloudpro.user.service.AuditService;
+import cn.huntercat.lieshou.framework.service.AuditService;
 import cn.huntercat.lieshoucloudpro.user.web.dto.UserAuthView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

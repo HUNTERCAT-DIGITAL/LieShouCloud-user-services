@@ -1,4 +1,5 @@
 package cn.huntercat.lieshoucloudpro.user.service;
+import cn.huntercat.lieshou.framework.service.CodeSender;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

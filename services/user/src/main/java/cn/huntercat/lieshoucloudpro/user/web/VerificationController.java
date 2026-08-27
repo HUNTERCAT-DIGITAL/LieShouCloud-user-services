@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 import cn.huntercat.lieshou.framework.domain.VerificationCode;
-import cn.huntercat.lieshoucloudpro.user.service.VerificationService;
+import cn.huntercat.lieshou.framework.service.VerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import cn.huntercat.lieshou.framework.domain.VerificationCode;
+import cn.huntercat.lieshou.framework.service.CodeSender;
 
 /**
  * 生产验证码发送器（ADR-0023 Phase 2 落地）.

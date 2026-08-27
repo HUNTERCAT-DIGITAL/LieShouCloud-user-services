@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cn.huntercat.lieshou.framework.common.audit.AuditEvent;
+import cn.huntercat.lieshou.framework.service.AuditService;
 import cn.huntercat.lieshou.framework.domain.AuditLog;
 import cn.huntercat.lieshou.framework.domain.AuditLogRepository;
 import java.time.Instant;
