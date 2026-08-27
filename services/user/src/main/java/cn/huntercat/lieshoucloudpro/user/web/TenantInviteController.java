@@ -12,40 +12,31 @@ import jakarta.validation.Valid;
 
 import cn.huntercat.lieshou.framework.common.web.TenantHeaders;
 import cn.huntercat.lieshou.framework.domain.TenantInvite;
-import cn.huntercat.lieshou.framework.domain.TenantInviteRepository;
-import cn.huntercat.lieshou.framework.domain.TenantRepository;
+import cn.huntercat.lieshou.framework.service.TenantInviteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.security.SecureRandom;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 邀请码端点（ADR-0023 Phase 2 · 租户管理员生成邀请码）.
+ * 邀请码端点（ADR-0023 Phase 2 · 薄壳装配）.
  *
  * <p>完整路径：{@code /api/tenants/{tenantId}/invites/**}（由 gateway 转发，需 JWT——平台运营操作）。
+ * 授权检查（PLATFORM_ADMIN / 本租户 TENANT_ADMIN）保留在 HTTP 层；业务（唯一码生成 /
+ * 租户校验 / role 白名单 / revoke）在 framework-service {@link TenantInviteService}。
  */
 @RestController
 @RequestMapping("/api/tenants/{tenantId}/invites")
 @Tag(name = "TenantInvite", description = "Invite codes for tenant self-registration")
 public class TenantInviteController {
 
-  /** 邀请码字符集（去易混淆 I/O/0/1） */
-  private static final char[] ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
+  private final TenantInviteService inviteService;
 
-  private static final int CODE_LENGTH = 8;
-  private static final SecureRandom RANDOM = new SecureRandom();
-
-  private final TenantRepository tenantRepo;
-  private final TenantInviteRepository inviteRepo;
-
-  public TenantInviteController(TenantRepository tenantRepo, TenantInviteRepository inviteRepo) {
-    this.tenantRepo = tenantRepo;
-    this.inviteRepo = inviteRepo;
+  public TenantInviteController(TenantInviteService inviteService) {
+    this.inviteService = inviteService;
   }
 
   /** RBAC（ADR-0024）：平台管理员 或 本租户管理员；否则 403 */
@@ -84,20 +75,9 @@ public class TenantInviteController {
     if (!authorized(rolesHeader, tenantHeader, tenantId)) {
       return forbidden();
     }
-    if (tenantRepo.findById(tenantId).isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    String role = (body.role() == null || body.role().isBlank()) ? "USER" : body.role();
-    if (!List.of("USER", "ADMIN").contains(role)) {
-      return ResponseEntity.badRequest().body(Map.of("error", "INVALID_ROLE"));
-    }
-    Instant expiresAt =
-        (body.expiresInDays() == null || body.expiresInDays() <= 0)
-            ? null
-            : Instant.now().plusSeconds(body.expiresInDays() * 86400L);
-    String code = generateUniqueCode();
-    TenantInvite invite = new TenantInvite(tenantId, code, role, expiresAt, body.maxUses(), null);
-    return ResponseEntity.ok(inviteRepo.save(invite));
+    TenantInvite invite =
+        inviteService.create(tenantId, body.role(), body.expiresInDays(), body.maxUses());
+    return ResponseEntity.ok(invite);
   }
 
   @Operation(summary = "List invites of tenant")
@@ -116,10 +96,8 @@ public class TenantInviteController {
     if (!authorized(rolesHeader, tenantHeader, tenantId)) {
       return forbidden();
     }
-    if (tenantRepo.findById(tenantId).isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    return ResponseEntity.ok(inviteRepo.findByTenantIdOrderByCreatedAtDesc(tenantId));
+    List<TenantInvite> invites = inviteService.list(tenantId);
+    return ResponseEntity.ok(invites);
   }
 
   @Operation(summary = "Revoke invite code")
@@ -142,28 +120,8 @@ public class TenantInviteController {
     if (!authorized(rolesHeader, tenantHeader, tenantId)) {
       return forbidden();
     }
-    java.util.Optional<TenantInvite> opt = inviteRepo.findById(id);
-    if (opt.isEmpty() || !opt.get().getTenantId().equals(tenantId)) {
-      return ResponseEntity.notFound().build();
-    }
-    TenantInvite inv = opt.get();
-    inv.setRevokedAt(Instant.now());
-    inviteRepo.save(inv);
+    inviteService.revoke(tenantId, id);
     return ResponseEntity.noContent().build();
-  }
-
-  private String generateUniqueCode() {
-    for (int attempt = 0; attempt < 20; attempt++) {
-      StringBuilder sb = new StringBuilder(CODE_LENGTH);
-      for (int i = 0; i < CODE_LENGTH; i++) {
-        sb.append(ALPHABET[RANDOM.nextInt(ALPHABET.length)]);
-      }
-      String code = sb.toString();
-      if (inviteRepo.findByCode(code).isEmpty()) {
-        return code;
-      }
-    }
-    throw new IllegalStateException("FAILED_TO_GENERATE_INVITE");
   }
 
   /** Phase 8: CreateInviteRequest DTO（内联；全部可选） */
