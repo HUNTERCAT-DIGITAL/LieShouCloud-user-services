@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -357,6 +358,43 @@ public class UserController {
    *
    * <p>仅 service-to-service 调用；通过 gateway 白名单 {@code /api/users/auth/**} 路径实现.
    */
+  @Operation(
+      summary = "Get tenant options by username (public, for login page)",
+      description =
+          "跨租户查该 username 可登录的租户（用户 ACTIVE 且租户 ACTIVE）；供登录页同用户名多租户选择。仅返回租户 code/name/edition，无敏感信息。")
+  @GetMapping("/auth/tenant-options")
+  public ResponseEntity<?> tenantOptions(
+      @Parameter(description = "Username") @RequestParam String username) {
+    List<User> users = repo.findAllByUsername(username);
+    if (users.isEmpty()) {
+      return ResponseEntity.ok(List.of());
+    }
+    java.util.Map<Long, Tenant> tenantsById =
+        tenantRepo.findAllById(users.stream().map(User::getTenantId).distinct().toList()).stream()
+            .collect(java.util.stream.Collectors.toMap(Tenant::getId, t -> t));
+    List<java.util.Map<String, Object>> options =
+        users.stream()
+            .filter(u -> u.getStatus() == null || u.getStatus() == User.Status.ACTIVE)
+            .map(User::getTenantId)
+            .distinct()
+            .map(tenantsById::get)
+            .filter(java.util.Objects::nonNull)
+            .filter(t -> t.getStatus() == null || t.getStatus() == Tenant.Status.ACTIVE)
+            .map(
+                t ->
+                    java.util.Map.<String, Object>of(
+                        "tenantId",
+                        t.getId(),
+                        "tenantCode",
+                        t.getCode(),
+                        "tenantName",
+                        t.getName(),
+                        "tenantEdition",
+                        t.getEdition() == null ? null : t.getEdition().name()))
+            .toList();
+    return ResponseEntity.ok(options);
+  }
+
   @Operation(
       summary = "Get user auth view by tenant (service-to-service, contains passwordHash)",
       description =

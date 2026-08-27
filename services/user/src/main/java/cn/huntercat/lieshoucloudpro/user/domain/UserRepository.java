@@ -13,6 +13,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
   /** 全局按 username 查（仅平台管理/兼容场景使用） */
   Optional<User> findByUsername(String username);
 
+  /** 跨租户按 username 查全部账号（登录页租户选项：同用户名多租户时供选择） */
+  List<User> findAllByUsername(String username);
+
   /** 按手机号查（全局唯一 · ADR-0023） */
   Optional<User> findByPhone(String phone);
 
