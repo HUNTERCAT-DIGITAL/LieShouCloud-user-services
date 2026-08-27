@@ -12,7 +12,7 @@
     </parent>
 
     <artifactId>lieshoucloud-user</artifactId>
-    <name>LieShouCloud · User Service</name>
+    <name>lieshou-cloud · User Service</name>
     <description>用户服务</description>
 
     <dependencies>

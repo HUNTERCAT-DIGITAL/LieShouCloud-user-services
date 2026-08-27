@@ -1,7 +1,7 @@
-# LieShouCloud-user-services · 开源后端服务:user
+# lieshou-cloud-user-services · 开源后端服务:user
 
-> 自 LieShouCloud-core/services/user 拆分(2026-08 细粒度)。
-> 组合:services/common → LieShouCloud-common。
+> 自 lieshou-cloud-core/services/user 拆分(2026-08 细粒度)。
+> 组合:services/common → lieshou-cloud-common。
 
 ```bash
 cd services
