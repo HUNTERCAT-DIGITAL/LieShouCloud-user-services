@@ -15,10 +15,9 @@ import jakarta.validation.Valid;
 import cn.huntercat.lieshou.framework.common.web.TenantHeaders;
 import cn.huntercat.lieshou.framework.domain.AuditLog;
 import cn.huntercat.lieshou.framework.domain.Tenant;
-import cn.huntercat.lieshou.framework.domain.TenantRepository;
-import cn.huntercat.lieshou.framework.domain.UserRepository;
 import cn.huntercat.lieshou.framework.service.AuditService;
 import cn.huntercat.lieshou.framework.service.TenantRegistrationService;
+import cn.huntercat.lieshou.framework.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,11 +26,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 
 /**
- * 租户管理端点（多租户 · ADR-0022 · Phase 8 运营视角）.
+ * 租户管理端点（多租户 · ADR-0022 · 薄壳装配）.
  *
- * <p>完整路径含上下文：{@code /api/tenants/**}（由 gateway 转发，需 JWT 鉴权——平台运营操作）。
- *
- * <p>RBAC（ADR-0024）：全部端点要求 {@code PLATFORM_ADMIN}（X-User-Roles header，由 gateway 从 JWT 注入）。
+ * <p>完整路径含上下文：{@code /api/tenants/**}。RBAC（ADR-0024）：全部端点要求
+ * {@code PLATFORM_ADMIN}；业务在 framework-service {@link TenantService}（生命周期 /
+ * code 唯一 / 枚举校验 / 空租户删除）；本层仅保留权限校验与审计记录（HTTP 关注点）。
  */
 @RestController
 @RequestMapping("/api/tenants")
@@ -40,20 +39,12 @@ import java.util.Map;
     description = "Tenant provisioning / lifecycle (platform ops, PLATFORM_ADMIN)")
 public class TenantController {
 
-  private final TenantRepository repo;
-  private final UserRepository userRepo;
+  private final TenantService tenantService;
   private final AuditService audit;
-  private final TenantRegistrationService registration;
 
-  public TenantController(
-      TenantRepository repo,
-      UserRepository userRepo,
-      AuditService audit,
-      TenantRegistrationService registration) {
-    this.repo = repo;
-    this.userRepo = userRepo;
+  public TenantController(TenantService tenantService, AuditService audit) {
+    this.tenantService = tenantService;
     this.audit = audit;
-    this.registration = registration;
   }
 
   @Operation(summary = "List all tenants", description = "Return every tenant (no pagination yet).")
@@ -68,7 +59,7 @@ public class TenantController {
     if (!AuthRoles.hasAny(rolesHeader, AuthRoles.PLATFORM_ADMIN)) {
       return forbidden();
     }
-    return ResponseEntity.ok(repo.findAll());
+    return ResponseEntity.ok(tenantService.list());
   }
 
   @Operation(summary = "Get tenant by id")
@@ -87,9 +78,7 @@ public class TenantController {
     if (!AuthRoles.hasAny(rolesHeader, AuthRoles.PLATFORM_ADMIN)) {
       return forbidden();
     }
-    return repo.findById(id)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.ok(tenantService.get(id));
   }
 
   @Operation(
@@ -102,32 +91,27 @@ public class TenantController {
   @PostMapping("/register")
   public ResponseEntity<?> register(
       @Valid @RequestBody RegisterTenantRequest body, jakarta.servlet.http.HttpServletRequest req) {
-    try {
-      TenantRegistrationService.RegistrationResult result =
-          registration.register(
-              body.tenantName(),
-              body.tenantCode(),
-              body.username(),
-              body.displayName(),
-              body.password(),
-              body.email());
-      audit.recordSuccess(
-          result.tenant().getId(),
-          null,
-          AuditLog.Action.CREATE,
-          "TENANT",
-          result.tenant().getId(),
-          "自助开通租户 " + result.tenant().getName() + " (" + result.tenant().getCode() + ")",
-          req);
-      return ResponseEntity.ok(
-          Map.of(
-              "tenant", result.tenant(),
-              "adminUsername", result.adminUsername(),
-              "adminDisplayName", result.adminDisplayName()));
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest()
-          .body(Map.of("error", "REGISTER_INVALID", "message", e.getMessage()));
-    }
+    TenantRegistrationService.RegistrationResult result =
+        tenantService.register(
+            body.tenantName(),
+            body.tenantCode(),
+            body.username(),
+            body.displayName(),
+            body.password(),
+            body.email());
+    audit.recordSuccess(
+        result.tenant().getId(),
+        null,
+        AuditLog.Action.CREATE,
+        "TENANT",
+        result.tenant().getId(),
+        "自助开通租户 " + result.tenant().getName() + " (" + result.tenant().getCode() + ")",
+        req);
+    return ResponseEntity.ok(
+        Map.of(
+            "tenant", result.tenant(),
+            "adminUsername", result.adminUsername(),
+            "adminDisplayName", result.adminDisplayName()));
   }
 
   @Operation(
@@ -156,16 +140,7 @@ public class TenantController {
     if (!AuthRoles.hasAny(rolesHeader, AuthRoles.PLATFORM_ADMIN)) {
       return forbidden();
     }
-    if (repo.findByCode(body.code()).isPresent()) {
-      return ResponseEntity.badRequest()
-          .body(Map.of("error", "TENANT_CODE_TAKEN", "code", body.code()));
-    }
-    Tenant.Edition edition = parseEdition(body.edition());
-    if (body.edition() != null && !body.edition().isBlank() && edition == null) {
-      return ResponseEntity.badRequest().body(Map.of("error", "INVALID_EDITION"));
-    }
-    Tenant t = new Tenant(body.name(), body.code(), edition);
-    Tenant saved = repo.save(t);
+    Tenant saved = tenantService.create(body.name(), body.code(), body.edition());
     audit.recordSuccess(
         TenantHeaders.parseLong(tenantHeader),
         TenantHeaders.parseLong(userIdHeader),
@@ -204,36 +179,16 @@ public class TenantController {
     if (!AuthRoles.hasAny(rolesHeader, AuthRoles.PLATFORM_ADMIN)) {
       return forbidden();
     }
-    return repo.findById(id)
-        .map(
-            t -> {
-              if (body.name() != null && !body.name().isBlank()) t.setName(body.name());
-              if (body.status() != null && !body.status().isBlank()) {
-                try {
-                  t.setStatus(Tenant.Status.valueOf(body.status()));
-                } catch (IllegalArgumentException e) {
-                  return ResponseEntity.badRequest().body(Map.of("error", "INVALID_STATUS"));
-                }
-              }
-              if (body.edition() != null && !body.edition().isBlank()) {
-                try {
-                  t.setEdition(Tenant.Edition.valueOf(body.edition()));
-                } catch (IllegalArgumentException e) {
-                  return ResponseEntity.badRequest().body(Map.of("error", "INVALID_EDITION"));
-                }
-              }
-              Tenant saved = repo.save(t);
-              audit.recordSuccess(
-                  TenantHeaders.parseLong(tenantHeader),
-                  TenantHeaders.parseLong(userIdHeader),
-                  AuditLog.Action.UPDATE,
-                  "TENANT",
-                  saved.getId(),
-                  "更新租户 " + saved.getName() + " (" + saved.getCode() + ")",
-                  req);
-              return ResponseEntity.ok(saved);
-            })
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    Tenant saved = tenantService.update(id, body.name(), body.status(), body.edition());
+    audit.recordSuccess(
+        TenantHeaders.parseLong(tenantHeader),
+        TenantHeaders.parseLong(userIdHeader),
+        AuditLog.Action.UPDATE,
+        "TENANT",
+        saved.getId(),
+        "更新租户 " + saved.getName() + " (" + saved.getCode() + ")",
+        req);
+    return ResponseEntity.ok(saved);
   }
 
   /** 删除租户（仅当无用户时允许；有用户 → 409，建议改用停用 status=DISABLED）. */
@@ -266,23 +221,14 @@ public class TenantController {
     if (!AuthRoles.hasAny(rolesHeader, AuthRoles.PLATFORM_ADMIN)) {
       return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).build();
     }
-    java.util.Optional<Tenant> opt = repo.findById(id);
-    if (opt.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    long userCount = userRepo.countByTenantId(id);
-    if (userCount > 0) {
-      return ResponseEntity.status(org.springframework.http.HttpStatus.CONFLICT).build();
-    }
-    Tenant t = opt.get();
-    repo.delete(t);
+    Tenant deleted = tenantService.delete(id);
     audit.recordSuccess(
         TenantHeaders.parseLong(tenantHeader),
         TenantHeaders.parseLong(userIdHeader),
         AuditLog.Action.DELETE,
         "TENANT",
         id,
-        "删除租户 " + t.getName() + " (" + t.getCode() + ")",
+        "删除租户 " + deleted.getName() + " (" + deleted.getCode() + ")",
         req);
     return ResponseEntity.noContent().build();
   }
@@ -309,14 +255,4 @@ public class TenantController {
 
   /** Phase 8: UpdateTenantRequest DTO（内联；name/status/edition 均可选） */
   public record UpdateTenantRequest(String name, String status, String edition) {}
-
-  /** 解析版别（空 → GENERIC；非法 → null 由调用方判定） */
-  private static Tenant.Edition parseEdition(String edition) {
-    if (edition == null || edition.isBlank()) return Tenant.Edition.GENERIC;
-    try {
-      return Tenant.Edition.valueOf(edition);
-    } catch (IllegalArgumentException e) {
-      return null;
-    }
-  }
 }
