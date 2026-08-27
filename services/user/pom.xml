@@ -79,7 +79,7 @@
         <!-- 底座共享：统一异常体 + 全局异常处理器（L2-1 · Bottom-Up） -->
         <dependency>
             <groupId>cn.huntercat</groupId>
-            <artifactId>lieshoucloud-common</artifactId>
+            <artifactId>framework-common</artifactId>
         </dependency>
 
         <!-- Spring Security crypto (BCrypt only; NOT full Security framework) -->

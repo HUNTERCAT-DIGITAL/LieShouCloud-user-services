@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 
-import cn.huntercat.lieshoucloudpro.common.web.TenantHeaders;
+import cn.huntercat.lieshou.framework.common.web.TenantHeaders;
 import cn.huntercat.lieshoucloudpro.user.domain.AuditLog;
 import cn.huntercat.lieshoucloudpro.user.domain.Tenant;
 import cn.huntercat.lieshoucloudpro.user.domain.TenantRepository;

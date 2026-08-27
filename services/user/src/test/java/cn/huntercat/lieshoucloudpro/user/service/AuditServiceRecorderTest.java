@@ -12,7 +12,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import cn.huntercat.lieshoucloudpro.common.audit.AuditEvent;
+import cn.huntercat.lieshou.framework.common.audit.AuditEvent;
 import cn.huntercat.lieshoucloudpro.user.domain.AuditLog;
 import cn.huntercat.lieshoucloudpro.user.domain.AuditLogRepository;
 import java.time.Instant;

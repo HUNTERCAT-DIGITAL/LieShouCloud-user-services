@@ -6,7 +6,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import cn.huntercat.lieshoucloudpro.common.security.PermissionChecker;
+import cn.huntercat.lieshou.framework.common.security.PermissionChecker;
 
 /**
  * 权限校验 SPI 实现（L2-1 注解接入 · user-service）.
