@@ -22,6 +22,5 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - name: Maven verify (spotless:check + tests + jacoco)
-        run: mvn -B -ntp -DskipITs -s .m2-settings.xml verify
-        working-directory: services
+      - name: Maven verify (聚合构建 · framework submodule + services)
+        run: mvn -B -ntp -DskipITs -s services/.m2-settings.xml -f pom.xml verify
