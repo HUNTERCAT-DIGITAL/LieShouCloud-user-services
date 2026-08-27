@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
  *   <li>{@link OpenAPIDefinition} —— Phase 5 SpringDoc 元信息；前端 openapi-typescript 用此生成 typed client
  * </ul>
  */
-@SpringBootApplication(scanBasePackages = "cn.huntercat.lieshoucloudpro")
+@SpringBootApplication(scanBasePackages = {"cn.huntercat.lieshoucloudpro", "cn.huntercat.lieshou.framework"})
 @EntityScan(basePackages = "cn.huntercat.lieshoucloudpro.user.domain")
 @EnableJpaRepositories(basePackages = "cn.huntercat.lieshoucloudpro.user.domain")
 @EnableDiscoveryClient
