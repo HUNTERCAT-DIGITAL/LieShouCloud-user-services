@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * 角色管理端点（RBAC · ADR-0024，薄壳装配）.
  *
- * <p>读：PLATFORM_ADMIN 或 TENANT_ADMIN（租户内管理员需要角色选项）；写：PLATFORM_ADMIN。
- * 业务（查重 / system 保护 / scope 解析）在 framework-service {@link RoleService}；
- * 鉴权与审计注解化（{@code @RequiresPermission} + {@code @Audited}）保留在 HTTP 层。
+ * <p>读：PLATFORM_ADMIN 或 TENANT_ADMIN（租户内管理员需要角色选项）；写：PLATFORM_ADMIN。 业务（查重 / system 保护 / scope 解析）在
+ * framework-service {@link RoleService}； 鉴权与审计注解化（{@code @RequiresPermission} +
+ * {@code @Audited}）保留在 HTTP 层。
  */
 @RestController
 @RequestMapping("/api/roles")
@@ -62,8 +62,7 @@ public class RoleController {
   @Audited(action = "UPDATE", resource = "role")
   public ResponseEntity<?> update(
       @PathVariable Long id, @Valid @RequestBody UpdateRoleRequest body) {
-    return ResponseEntity.ok(
-        roleService.update(id, body.name(), body.scope(), body.description()));
+    return ResponseEntity.ok(roleService.update(id, body.name(), body.scope(), body.description()));
   }
 
   @Operation(

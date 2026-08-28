@@ -1,8 +1,5 @@
 package cn.huntercat.lieshoucloudpro.user.web;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 import cn.huntercat.lieshou.framework.common.dto.UserAuthView;
 import cn.huntercat.lieshou.framework.common.web.TenantHeaders;
@@ -25,16 +25,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.Map;
 
 /**
  * 用户管理端点（多租户 · ADR-0022 · 薄壳装配）.
  *
- * <p>业务（创建三分支 / 查重 / 密码编码 / 租户隔离 / 认证视图）在 framework-service
- * {@link UserService}（ADR-0044 阶段 3）；本层仅保留：跨租户查看的 PLATFORM_ADMIN
- * 权限校验、审计记录（req 依赖）、REST 响应组装。错误码契约由 service 抛
- * {@code BaseException} → GlobalExceptionHandler 统一转 {error, message}。
+ * <p>业务（创建三分支 / 查重 / 密码编码 / 租户隔离 / 认证视图）在 framework-service {@link UserService}（ADR-0044 阶段
+ * 3）；本层仅保留：跨租户查看的 PLATFORM_ADMIN 权限校验、审计记录（req 依赖）、REST 响应组装。错误码契约由 service 抛 {@code BaseException}
+ * → GlobalExceptionHandler 统一转 {error, message}。
  */
 @RestController
 @RequestMapping("/api/users")
@@ -137,7 +135,9 @@ public class UserController {
             "tenantCode", result.tenant().getCode(),
             "tenantName", result.tenant().getName(),
             "tenantEdition",
-                result.tenant().getEdition() == null ? "GENERIC" : result.tenant().getEdition().name(),
+                result.tenant().getEdition() == null
+                    ? "GENERIC"
+                    : result.tenant().getEdition().name(),
             "username", saved.getUsername(),
             "displayName", saved.getDisplayName()));
   }
@@ -213,8 +213,8 @@ public class UserController {
   }
 
   /**
-   * 跨租户查该 username 可登录的租户（供登录页同用户名多租户选择）.
-   * 仅 service-to-service；gateway 白名单 {@code /api/users/auth/**} 已覆盖。
+   * 跨租户查该 username 可登录的租户（供登录页同用户名多租户选择）. 仅 service-to-service；gateway 白名单 {@code
+   * /api/users/auth/**} 已覆盖。
    */
   @Operation(summary = "Tenant options by username (service-to-service)")
   @GetMapping("/auth/tenant-options")
@@ -229,8 +229,7 @@ public class UserController {
    *
    * <p>仅 service-to-service 调用；通过 gateway 白名单 {@code /api/users/auth/**} 路径实现.
    */
-  @Operation(
-      summary = "Get user auth view by tenant (service-to-service, contains passwordHash)")
+  @Operation(summary = "Get user auth view by tenant (service-to-service, contains passwordHash)")
   @GetMapping("/auth/by-tenant/{tenantCode}/{username}")
   public ResponseEntity<?> authByTenantAndUsername(
       @Parameter(description = "Tenant code", example = "huntercat") @PathVariable

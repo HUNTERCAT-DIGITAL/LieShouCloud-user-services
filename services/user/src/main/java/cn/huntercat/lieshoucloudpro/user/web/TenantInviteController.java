@@ -25,8 +25,8 @@ import java.util.Map;
  * 邀请码端点（ADR-0023 Phase 2 · 薄壳装配）.
  *
  * <p>完整路径：{@code /api/tenants/{tenantId}/invites/**}（由 gateway 转发，需 JWT——平台运营操作）。
- * 授权检查（PLATFORM_ADMIN / 本租户 TENANT_ADMIN）保留在 HTTP 层；业务（唯一码生成 /
- * 租户校验 / role 白名单 / revoke）在 framework-service {@link TenantInviteService}。
+ * 授权检查（PLATFORM_ADMIN / 本租户 TENANT_ADMIN）保留在 HTTP 层；业务（唯一码生成 / 租户校验 / role 白名单 / revoke）在
+ * framework-service {@link TenantInviteService}。
  */
 @RestController
 @RequestMapping("/api/tenants/{tenantId}/invites")

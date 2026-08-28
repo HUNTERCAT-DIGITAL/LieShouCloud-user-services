@@ -28,9 +28,8 @@ import java.util.Map;
 /**
  * 租户管理端点（多租户 · ADR-0022 · 薄壳装配）.
  *
- * <p>完整路径含上下文：{@code /api/tenants/**}。RBAC（ADR-0024）：全部端点要求
- * {@code PLATFORM_ADMIN}；业务在 framework-service {@link TenantService}（生命周期 /
- * code 唯一 / 枚举校验 / 空租户删除）；本层仅保留权限校验与审计记录（HTTP 关注点）。
+ * <p>完整路径含上下文：{@code /api/tenants/**}。RBAC（ADR-0024）：全部端点要求 {@code PLATFORM_ADMIN}；业务在
+ * framework-service {@link TenantService}（生命周期 / code 唯一 / 枚举校验 / 空租户删除）；本层仅保留权限校验与审计记录（HTTP 关注点）。
  */
 @RestController
 @RequestMapping("/api/tenants")

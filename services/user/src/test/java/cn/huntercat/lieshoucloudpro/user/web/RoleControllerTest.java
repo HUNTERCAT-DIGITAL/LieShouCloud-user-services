@@ -1,5 +1,16 @@
 package cn.huntercat.lieshoucloudpro.user.web;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -14,22 +25,11 @@ import cn.huntercat.lieshou.framework.common.web.GlobalExceptionHandler;
 import cn.huntercat.lieshou.framework.domain.Role;
 import cn.huntercat.lieshou.framework.service.RoleService;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 /**
  * RoleController web 层契约测试.
  *
- * <p>锁定错误码契约：ROLE_CODE_TAKEN / SYSTEM_ROLE_READONLY / NOT_FOUND。
- * 注：@RequiresPermission / @Audited 为 Spring AOP 注解（standalone MockMvc 不织入），
- * 权限行为由 RequiresPermissionAspectTest / 运行集成验证覆盖。
+ * <p>锁定错误码契约：ROLE_CODE_TAKEN / SYSTEM_ROLE_READONLY / NOT_FOUND。 注：@RequiresPermission / @Audited 为
+ * Spring AOP 注解（standalone MockMvc 不织入）， 权限行为由 RequiresPermissionAspectTest / 运行集成验证覆盖。
  */
 @ExtendWith(MockitoExtension.class)
 class RoleControllerTest {
@@ -81,9 +81,7 @@ class RoleControllerTest {
 
     mockMvc
         .perform(
-            put("/api/roles/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\":\"x\"}"))
+            put("/api/roles/1").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"x\"}"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.error").value("SYSTEM_ROLE_READONLY"));
   }
@@ -91,7 +89,8 @@ class RoleControllerTest {
   @Test
   void delete_不存在映射404_NOT_FOUND() throws Exception {
     org.mockito.Mockito.doThrow(new BaseException("NOT_FOUND", HttpStatus.NOT_FOUND, "角色不存在"))
-        .when(roleService).delete(99L);
+        .when(roleService)
+        .delete(99L);
 
     mockMvc
         .perform(delete("/api/roles/99"))

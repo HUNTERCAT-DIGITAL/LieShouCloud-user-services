@@ -1,5 +1,16 @@
 package cn.huntercat.lieshoucloudpro.user.web;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -18,21 +29,11 @@ import cn.huntercat.lieshou.framework.service.AuditService;
 import cn.huntercat.lieshou.framework.service.TenantRegistrationService;
 import cn.huntercat.lieshou.framework.service.TenantService;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 /**
  * TenantController web 层契约测试.
  *
- * <p>锁定错误码契约：FORBIDDEN / TENANT_CODE_TAKEN / INVALID_EDITION / INVALID_STATUS /
- * REGISTER_INVALID / CONFLICT / NOT_FOUND；自助注册公开端点（无鉴权）。
+ * <p>锁定错误码契约：FORBIDDEN / TENANT_CODE_TAKEN / INVALID_EDITION / INVALID_STATUS / REGISTER_INVALID /
+ * CONFLICT / NOT_FOUND；自助注册公开端点（无鉴权）。
  */
 @ExtendWith(MockitoExtension.class)
 class TenantControllerTest {
@@ -130,13 +131,15 @@ class TenantControllerTest {
   @Test
   void register_公开端点且非法输入映射400_REGISTER_INVALID() throws Exception {
     when(tenantService.register(any(), any(), any(), any(), any(), any()))
-        .thenThrow(new BaseException("REGISTER_INVALID", HttpStatus.BAD_REQUEST, "租户编码已被占用: huntercat"));
+        .thenThrow(
+            new BaseException("REGISTER_INVALID", HttpStatus.BAD_REQUEST, "租户编码已被占用: huntercat"));
 
     mockMvc
         .perform(
             post("/api/tenants/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"tenantName\":\"x\",\"tenantCode\":\"huntercat\",\"username\":\"a\",\"displayName\":\"a\",\"password\":\"secret123\"}"))
+                .content(
+                    "{\"tenantName\":\"x\",\"tenantCode\":\"huntercat\",\"username\":\"a\",\"displayName\":\"a\",\"password\":\"secret123\"}"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.error").value("REGISTER_INVALID"));
   }
@@ -151,7 +154,8 @@ class TenantControllerTest {
         .perform(
             post("/api/tenants/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"tenantName\":\"测试\",\"tenantCode\":\"acme\",\"username\":\"admin\",\"displayName\":\"管理员\",\"password\":\"secret123\"}"))
+                .content(
+                    "{\"tenantName\":\"测试\",\"tenantCode\":\"acme\",\"username\":\"admin\",\"displayName\":\"管理员\",\"password\":\"secret123\"}"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.adminUsername").value("admin"))
         .andExpect(jsonPath("$.tenant.code").value("acme"));

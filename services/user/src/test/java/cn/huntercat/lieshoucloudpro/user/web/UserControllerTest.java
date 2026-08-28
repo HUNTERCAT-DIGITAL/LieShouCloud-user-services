@@ -1,7 +1,17 @@
 package cn.huntercat.lieshoucloudpro.user.web;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -19,21 +29,11 @@ import cn.huntercat.lieshou.framework.service.AuditService;
 import cn.huntercat.lieshou.framework.service.UserService;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 /**
  * UserController web 层契约测试（MockMvc standalone + GlobalExceptionHandler）.
  *
- * <p>锁定错误码契约：USERNAME_TAKEN / INVALID_INVITE / INVALID_STATUS / NOT_FOUND /
- * TENANT_DISABLED / FORBIDDEN；正常路径响应结构。
+ * <p>锁定错误码契约：USERNAME_TAKEN / INVALID_INVITE / INVALID_STATUS / NOT_FOUND / TENANT_DISABLED /
+ * FORBIDDEN；正常路径响应结构。
  */
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -96,7 +96,8 @@ class UserControllerTest {
             post("/api/users")
                 .header("X-Tenant-Id", "1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"admin\",\"displayName\":\"管理员\",\"password\":\"x12345\"}"))
+                .content(
+                    "{\"username\":\"admin\",\"displayName\":\"管理员\",\"password\":\"x12345\"}"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.username").value("admin"))
         .andExpect(jsonPath("$.tenantCode").value("huntercat"))
@@ -127,7 +128,8 @@ class UserControllerTest {
         .perform(
             post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"a\",\"displayName\":\"a\",\"password\":\"x12345\",\"inviteCode\":\"BAD\"}"))
+                .content(
+                    "{\"username\":\"a\",\"displayName\":\"a\",\"password\":\"x12345\",\"inviteCode\":\"BAD\"}"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.error").value("INVALID_INVITE"));
   }
@@ -169,7 +171,18 @@ class UserControllerTest {
 
   @Test
   void authView_成功返回视图() throws Exception {
-    UserAuthView view = new UserAuthView(1L, 1L, "huntercat", "猎手云", "GENERIC", "admin", "管理员", "hash", List.of("PLATFORM_ADMIN"), "ACTIVE");
+    UserAuthView view =
+        new UserAuthView(
+            1L,
+            1L,
+            "huntercat",
+            "猎手云",
+            "GENERIC",
+            "admin",
+            "管理员",
+            "hash",
+            List.of("PLATFORM_ADMIN"),
+            "ACTIVE");
     when(userService.authViewByTenantAndUsername("huntercat", "admin")).thenReturn(view);
 
     mockMvc
