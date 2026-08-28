@@ -37,18 +37,19 @@ ON CONFLICT (user_id, role_id) DO NOTHING;
 -- 值班员账号（dwjk 物联网云平台 · 2026-08-25）
 --   用户名 duty / 默认密码 admin123（⚠️ 仅开发环境）
 --   角色：DUTY_OFFICER（值班监控只读；前端隐藏配置/管理菜单）
+--   租户：huntercat（dwjk 单租户部署与前端 defaultTenantCode 一致）
 -- ============================================================
 INSERT INTO users (tenant_id, username, display_name, email, password_hash, status)
-SELECT t.id, 'duty', '值班员', 'duty@dwjk.local',
+SELECT t.id, 'duty', '值班员', 'duty@huntercat.local',
        '$2b$10$/zX3Q157zlkzZ3dcg41yO.oGKDLMdPL6ZGHQS8Bt9iJVlC1u/u4ee', 'ACTIVE'
 FROM tenants t
-WHERE t.code = 'dwjk'
+WHERE t.code = 'huntercat'
 ON CONFLICT (tenant_id, username) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id
 FROM users u
-JOIN tenants t ON t.id = u.tenant_id AND t.code = 'dwjk'
+JOIN tenants t ON t.id = u.tenant_id AND t.code = 'huntercat'
 JOIN roles r ON r.code = 'DUTY_OFFICER'
 WHERE u.username = 'duty'
 ON CONFLICT (user_id, role_id) DO NOTHING;
