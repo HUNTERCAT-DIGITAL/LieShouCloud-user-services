@@ -306,4 +306,30 @@ public class UserController {
       String status,
       String[] roles,
       String password) {}
+
+  /**
+   * 自助修改密码（本人 · 校验原密码）。
+   *
+   * <p>业务在 framework {@code UserService.changePassword}（OLD_PASSWORD_MISMATCH /
+   * INVALID_PASSWORD / USER_NOT_FOUND → GlobalExceptionHandler 统一转 {error, message}）。
+   * 不写审计（本人低频操作；如需要可后续补）。
+   */
+  @Operation(summary = "Change own password", description = "Self-service: verify old password then update.")
+  @PutMapping("/me/password")
+  public ResponseEntity<?> changePassword(
+      @RequestHeader(value = "X-User-Id", required = false) String userIdHeader,
+      @RequestBody ChangePasswordRequest body) {
+    Long uid = parseUserId(userIdHeader);
+    if (uid == null) {
+      return ResponseEntity.status(401)
+          .body(Map.of("error", "AUTH_REQUIRED", "message", "未登录或身份校验失败"));
+    }
+    userService.changePassword(uid, body.oldPassword(), body.newPassword());
+    return ResponseEntity.ok(Map.of("success", true));
+  }
+
+  /** 自助修改密码请求 DTO */
+  public record ChangePasswordRequest(
+      @jakarta.validation.constraints.NotBlank String oldPassword,
+      @jakarta.validation.constraints.NotBlank String newPassword) {}
 }
