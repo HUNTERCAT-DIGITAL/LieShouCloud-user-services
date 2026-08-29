@@ -310,11 +310,12 @@ public class UserController {
   /**
    * 自助修改密码（本人 · 校验原密码）。
    *
-   * <p>业务在 framework {@code UserService.changePassword}（OLD_PASSWORD_MISMATCH /
-   * INVALID_PASSWORD / USER_NOT_FOUND → GlobalExceptionHandler 统一转 {error, message}）。
-   * 不写审计（本人低频操作；如需要可后续补）。
+   * <p>业务在 framework {@code UserService.changePassword}（OLD_PASSWORD_MISMATCH / INVALID_PASSWORD /
+   * USER_NOT_FOUND → GlobalExceptionHandler 统一转 {error, message}）。 不写审计（本人低频操作；如需要可后续补）。
    */
-  @Operation(summary = "Change own password", description = "Self-service: verify old password then update.")
+  @Operation(
+      summary = "Change own password",
+      description = "Self-service: verify old password then update.")
   @PutMapping("/me/password")
   public ResponseEntity<?> changePassword(
       @RequestHeader(value = "X-User-Id", required = false) String userIdHeader,
