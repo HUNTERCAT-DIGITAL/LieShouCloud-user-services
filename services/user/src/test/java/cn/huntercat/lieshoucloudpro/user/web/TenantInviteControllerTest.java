@@ -19,7 +19,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import cn.huntercat.lieshou.framework.common.api.BaseException;
+import org.springframework.beans.factory.ObjectProvider;
 import cn.huntercat.lieshou.framework.common.web.GlobalExceptionHandler;
+import cn.huntercat.lieshou.framework.i18n.I18nMessages;
 import cn.huntercat.lieshou.framework.domain.TenantInvite;
 import cn.huntercat.lieshou.framework.service.TenantInviteService;
 
@@ -33,13 +35,15 @@ class TenantInviteControllerTest {
 
   @Mock TenantInviteService inviteService;
 
+  @Mock ObjectProvider<I18nMessages> provider;
+
   MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
     mockMvc =
         MockMvcBuilders.standaloneSetup(new TenantInviteController(inviteService))
-            .setControllerAdvice(new GlobalExceptionHandler())
+            .setControllerAdvice(new GlobalExceptionHandler(provider))
             .build();
   }
 

@@ -23,7 +23,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import cn.huntercat.lieshou.framework.common.api.BaseException;
 import cn.huntercat.lieshou.framework.common.api.ErrorCode;
+import org.springframework.beans.factory.ObjectProvider;
 import cn.huntercat.lieshou.framework.common.web.GlobalExceptionHandler;
+import cn.huntercat.lieshou.framework.i18n.I18nMessages;
 import cn.huntercat.lieshou.framework.domain.Tenant;
 import cn.huntercat.lieshou.framework.service.AuditService;
 import cn.huntercat.lieshou.framework.service.TenantRegistrationService;
@@ -39,6 +41,8 @@ import cn.huntercat.lieshou.framework.service.TenantService;
 class TenantControllerTest {
 
   @Mock TenantService tenantService;
+
+  @Mock ObjectProvider<I18nMessages> provider;
   @Mock AuditService auditService;
 
   MockMvc mockMvc;
@@ -47,7 +51,7 @@ class TenantControllerTest {
   void setUp() {
     mockMvc =
         MockMvcBuilders.standaloneSetup(new TenantController(tenantService, auditService))
-            .setControllerAdvice(new GlobalExceptionHandler())
+            .setControllerAdvice(new GlobalExceptionHandler(provider))
             .build();
   }
 

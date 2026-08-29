@@ -21,7 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import cn.huntercat.lieshou.framework.common.api.BaseException;
+import org.springframework.beans.factory.ObjectProvider;
+import org.mockito.Mock;
 import cn.huntercat.lieshou.framework.common.web.GlobalExceptionHandler;
+import cn.huntercat.lieshou.framework.i18n.I18nMessages;
 import cn.huntercat.lieshou.framework.domain.Role;
 import cn.huntercat.lieshou.framework.service.RoleService;
 
@@ -36,13 +39,15 @@ class RoleControllerTest {
 
   @Mock RoleService roleService;
 
+  @Mock ObjectProvider<I18nMessages> provider;
+
   MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
     mockMvc =
         MockMvcBuilders.standaloneSetup(new RoleController(roleService))
-            .setControllerAdvice(new GlobalExceptionHandler())
+            .setControllerAdvice(new GlobalExceptionHandler(provider))
             .build();
   }
 

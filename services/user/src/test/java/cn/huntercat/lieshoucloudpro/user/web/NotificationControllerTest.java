@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -55,8 +57,8 @@ class NotificationControllerTest extends PostgresTestSupport {
   @Test
   @DisplayName("带租户/用户上下文 → 返回列表")
   void list_withContext() throws Exception {
-    when(repo.findByTenantIdAndUserIdOrderByReadAtAscCreatedAtDesc(7L, 3L))
-        .thenReturn(List.of(n(1L, 7L, 3L, false)));
+    when(repo.findUnreadFirst(eq(7L), eq(3L), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of(n(1L, 7L, 3L, false))));
     mockMvc
         .perform(get("/api/notifications").header("X-Tenant-Id", "7").header("X-User-Id", "3"))
         .andExpect(status().isOk())

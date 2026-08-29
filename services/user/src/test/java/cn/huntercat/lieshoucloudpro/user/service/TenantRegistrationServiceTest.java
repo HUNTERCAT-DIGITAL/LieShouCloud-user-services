@@ -101,7 +101,7 @@ class TenantRegistrationServiceTest {
   void register_weakPassword_rejected() {
     assertThatThrownBy(() -> service.register("公司", "sampleco", "admin", "管理员", "123", null))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("密码至少 6 位");
+        .hasMessageContaining("密码至少 8 位");
   }
 
   @Test

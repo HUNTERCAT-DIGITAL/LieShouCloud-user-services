@@ -46,9 +46,9 @@ class UserRepositoryTest extends PostgresTestSupport {
   @Test
   @DisplayName("Flyway V2 seed：存在默认租户 huntercat")
   void tenantSeed_exists() {
-    var tenant = tenantRepo.findByCode("huntercat");
+    var tenant = tenantRepo.findByCode("default");
     assertThat(tenant).isPresent();
-    assertThat(tenant.get().getName()).contains("猎手猫");
+    assertThat(tenant.get().getName()).contains("默认租户");
   }
 
   @Test
