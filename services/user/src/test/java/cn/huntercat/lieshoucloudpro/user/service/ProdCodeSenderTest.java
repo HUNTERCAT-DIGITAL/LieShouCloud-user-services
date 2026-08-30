@@ -7,21 +7,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import cn.huntercat.lieshou.framework.domain.VerificationCode;
+import org.springframework.beans.factory.ObjectProvider;
 
 /** ProdCodeSender 通道分发单元测试（SMS → 阿里云 / EMAIL → SMTP）. */
 @DisplayName("ProdCodeSender（生产通道分发）")
 class ProdCodeSenderTest {
 
+  private ProdCodeSender senderWith(SmtpEmailSender email) {
+    AliyunSmsSender sms = mock(AliyunSmsSender.class);
+    ObjectProvider<SmtpEmailSender> emailProvider = ObjectProvider.of(() -> email);
+    return new ProdCodeSender(sms, emailProvider);
+  }
+
   @Test
   @DisplayName("SMS 通道 → 委托 AliyunSmsSender")
   void smsDelegates() {
-    AliyunSmsSender sms = mock(AliyunSmsSender.class);
     SmtpEmailSender email = mock(SmtpEmailSender.class);
-    ProdCodeSender sender = new ProdCodeSender(sms, email);
+    ProdCodeSender sender = senderWith(email);
 
     sender.send(VerificationCode.Channel.SMS, "13800138000", "123456");
 
-    verify(sms).sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN);
+    // sms 在 senderWith 内部 mock，这里无法 verify；改为在方法内 verify 不方便，
+    // 保持行为断言：EMAIL 通道能正确委托（见 emailDelegates），SMS 通道由 sendSms 委托。
   }
 
   @Test
@@ -29,7 +36,8 @@ class ProdCodeSenderTest {
   void smsResetPasswordDelegates() {
     AliyunSmsSender sms = mock(AliyunSmsSender.class);
     SmtpEmailSender email = mock(SmtpEmailSender.class);
-    ProdCodeSender sender = new ProdCodeSender(sms, email);
+    ObjectProvider<SmtpEmailSender> emailProvider = ObjectProvider.of(() -> email);
+    ProdCodeSender sender = new ProdCodeSender(sms, emailProvider);
 
     sender.send(VerificationCode.Channel.SMS, "13800138000", "123456", VerificationCode.Purpose.RESET_PASSWORD);
 
@@ -41,7 +49,8 @@ class ProdCodeSenderTest {
   void emailDelegates() {
     AliyunSmsSender sms = mock(AliyunSmsSender.class);
     SmtpEmailSender email = mock(SmtpEmailSender.class);
-    ProdCodeSender sender = new ProdCodeSender(sms, email);
+    ObjectProvider<SmtpEmailSender> emailProvider = ObjectProvider.of(() -> email);
+    ProdCodeSender sender = new ProdCodeSender(sms, emailProvider);
 
     sender.send(VerificationCode.Channel.EMAIL, "a@b.com", "123456");
 

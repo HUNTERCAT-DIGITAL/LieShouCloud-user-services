@@ -1,9 +1,5 @@
 package cn.huntercat.lieshoucloudpro.user.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +21,8 @@ import cn.huntercat.lieshou.framework.domain.VerificationCode;
  *   <li>非 OK 响应码 → {@link IllegalStateException}（调用方按业务失败处理，验证码不落库）。
  * </ul>
  *
- * <p>仅 prod profile 生效；dev/docker/test 走 {@link DevCodeSender}（日志旁路）。
+ * <p>由 {@code AliyunSmsConfig} 按配置装配（配了 AccessKey 即生效，不区分环境）。
  */
-@Component
-@Profile("prod")
 public class AliyunSmsSender {
 
   private static final Logger log = LoggerFactory.getLogger(AliyunSmsSender.class);
@@ -42,9 +36,9 @@ public class AliyunSmsSender {
 
   public AliyunSmsSender(
       Client client,
-      @Value("${ALIYUN_SMS_SIGN_NAME:}") String signName,
-      @Value("${ALIYUN_SMS_TEMPLATE_CODE:}") String templateCode,
-      @Value("${ALIYUN_SMS_TEMPLATE_RESET_CODE:}") String resetTemplateCode) {
+      String signName,
+      String templateCode,
+      String resetTemplateCode) {
     this.client = client;
     this.signName = signName;
     this.templateCode = templateCode;

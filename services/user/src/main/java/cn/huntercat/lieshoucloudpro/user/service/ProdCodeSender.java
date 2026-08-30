@@ -1,7 +1,6 @@
 package cn.huntercat.lieshoucloudpro.user.service;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.ObjectProvider;
 
 import cn.huntercat.lieshou.framework.domain.VerificationCode;
 import cn.huntercat.lieshou.framework.service.CodeSender;
@@ -9,26 +8,24 @@ import cn.huntercat.lieshou.framework.service.CodeSender;
 /**
  * 生产验证码发送器（ADR-0023 Phase 2 落地）.
  *
- * <p>通道分发：
+ * <p>通道分发（由 {@code AliyunSmsConfig} 按配置装配，不区分环境）：
  *
  * <ul>
  *   <li><b>SMS</b> —— 阿里云短信（{@link AliyunSmsSender}，dysmsapi 真实调用）；
- *   <li><b>EMAIL</b> —— 飞书邮箱 SMTP（{@link SmtpEmailSender}，smtp.feishu.cn）。
+ *   <li><b>EMAIL</b> —— 飞书邮箱 SMTP（{@link SmtpEmailSender}，smtp.feishu.cn；未配置则抛业务异常）。
  * </ul>
  *
- * <p>安全纪律：生产**绝不**把验证码打进日志（与 {@link DevCodeSender} 相反——那是 dev 联调特权）。 接入真实通道时同步更新 {@code
- * deploy/nacos-config} 中相关配置项。
+ * <p>安全纪律：生产**绝不**把验证码打进日志（与 {@link DevCodeSender} 相反——那是未配短信时的联调旁路）。
  */
-@Component
-@Profile("prod")
 public class ProdCodeSender implements CodeSender {
 
   private final AliyunSmsSender smsSender;
-  private final SmtpEmailSender emailSender;
+  private final ObjectProvider<SmtpEmailSender> emailSenderProvider;
 
-  public ProdCodeSender(AliyunSmsSender smsSender, SmtpEmailSender emailSender) {
+  public ProdCodeSender(
+      AliyunSmsSender smsSender, ObjectProvider<SmtpEmailSender> emailSenderProvider) {
     this.smsSender = smsSender;
-    this.emailSender = emailSender;
+    this.emailSenderProvider = emailSenderProvider;
   }
 
   @Override
@@ -48,6 +45,10 @@ public class ProdCodeSender implements CodeSender {
         smsSender.sendSms(target, code, purpose);
         return;
       case EMAIL:
+        SmtpEmailSender emailSender = emailSenderProvider.getIfAvailable();
+        if (emailSender == null) {
+          throw new IllegalStateException("邮件通道未配置（需 EMAIL_SMTP_HOST 等 SMTP 配置）");
+        }
         emailSender.sendVerificationEmail(target, code);
         return;
       default:
