@@ -17,8 +17,8 @@
 -- 管理员账号（password_hash = BCrypt("admin123", strength 10)，与
 -- user-service / auth-service 的 BCryptPasswordEncoder 默认强度一致，已用
 -- spring-security-crypto 6.5.6 实测 matches=true）
-INSERT INTO users (tenant_id, username, display_name, email, password_hash, status)
-SELECT t.id, 'admin', '平台管理员', 'admin@huntercat.cn',
+INSERT INTO users (tenant_id, username, display_name, email, phone, password_hash, status)
+SELECT t.id, 'admin', '平台管理员', 'admin@huntercat.cn', '18607097289',
        '$2b$10$/zX3Q157zlkzZ3dcg41yO.oGKDLMdPL6ZGHQS8Bt9iJVlC1u/u4ee', 'ACTIVE'
 FROM tenants t
 WHERE t.code = 'default'
@@ -39,8 +39,8 @@ ON CONFLICT (user_id, role_id) DO NOTHING;
 --   角色：DUTY_OFFICER（值班监控只读；前端隐藏配置/管理菜单）
 --   租户：default（全局统一默认租户）
 -- ============================================================
-INSERT INTO users (tenant_id, username, display_name, email, password_hash, status)
-SELECT t.id, 'duty', '值班员', 'duty@huntercat.local',
+INSERT INTO users (tenant_id, username, display_name, email, phone, password_hash, status)
+SELECT t.id, 'duty', '值班员', 'duty@huntercat.local', '13207005414',
        '$2b$10$/zX3Q157zlkzZ3dcg41yO.oGKDLMdPL6ZGHQS8Bt9iJVlC1u/u4ee', 'ACTIVE'
 FROM tenants t
 WHERE t.code = 'default'
@@ -53,3 +53,7 @@ JOIN tenants t ON t.id = u.tenant_id AND t.code = 'default'
 JOIN roles r ON r.code = 'DUTY_OFFICER'
 WHERE u.username = 'duty'
 ON CONFLICT (user_id, role_id) DO NOTHING;
+
+-- 手机号（短信验证码登录/忘记密码 · 2026-09）：已存在账号幂等更新（INSERT DO NOTHING 不更新旧行）
+UPDATE users SET phone = '18607097289' WHERE username = 'admin' AND phone IS DISTINCT FROM '18607097289';
+UPDATE users SET phone = '13207005414' WHERE username = 'duty' AND phone IS DISTINCT FROM '13207005414';
