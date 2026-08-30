@@ -4,21 +4,26 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.aliyun.dysmsapi20170525.Client;
+import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import cn.huntercat.lieshou.framework.domain.VerificationCode;
 
 /** AliyunSmsSender 单元测试（mock dysmsapi Client，不启动 Spring 上下文）. */
 @DisplayName("AliyunSmsSender（阿里云短信发送）")
 class AliyunSmsSenderTest {
 
-  private static final String SIGN = "南昌猎手猫数字科技";
-  private static final String TEMPLATE = "SMS_166315875";
+  private static final String SIGN = "阿基皕科技";
+  private static final String TEMPLATE = "SMS_152461729";
+  private static final String RESET_TEMPLATE = "SMS_152461726";
 
   private static SendSmsResponse response(String code, String message) {
     return new SendSmsResponse()
@@ -30,9 +35,25 @@ class AliyunSmsSenderTest {
   void ok() throws Exception {
     Client client = mock(Client.class);
     when(client.sendSms(any())).thenReturn(response("OK", "OK"));
-    AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE);
+    AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE, RESET_TEMPLATE);
 
-    sender.sendSms("13800138000", "123456");
+    sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN);
+  }
+
+  @Test
+  @DisplayName("LOGIN → 登录验证码模板；RESET_PASSWORD → 改密验证码模板")
+  void templateByPurpose() throws Exception {
+    Client client = mock(Client.class);
+    when(client.sendSms(any())).thenReturn(response("OK", "OK"));
+    AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE, RESET_TEMPLATE);
+
+    sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN);
+    sender.sendSms("13800138000", "654321", VerificationCode.Purpose.RESET_PASSWORD);
+
+    org.mockito.Mockito.verify(client)
+        .sendSms(argThat((SendSmsRequest r) -> TEMPLATE.equals(r.getTemplateCode())));
+    org.mockito.Mockito.verify(client)
+        .sendSms(argThat((SendSmsRequest r) -> RESET_TEMPLATE.equals(r.getTemplateCode())));
   }
 
   @Test
@@ -40,9 +61,9 @@ class AliyunSmsSenderTest {
   void businessError() throws Exception {
     Client client = mock(Client.class);
     when(client.sendSms(any())).thenReturn(response("isv.SMS_SIGNATURE_ILLEGAL", "签名不合法"));
-    AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE);
+    AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE, RESET_TEMPLATE);
 
-    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456"))
+    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("签名不合法");
   }
@@ -51,9 +72,9 @@ class AliyunSmsSenderTest {
   @DisplayName("签名或模板未配置 → fail-fast IllegalStateException")
   void missingConfig() {
     Client client = mock(Client.class);
-    AliyunSmsSender sender = new AliyunSmsSender(client, "", TEMPLATE);
+    AliyunSmsSender sender = new AliyunSmsSender(client, "", TEMPLATE, RESET_TEMPLATE);
 
-    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456"))
+    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("ALIYUN_SMS_SIGN_NAME");
   }
@@ -63,9 +84,9 @@ class AliyunSmsSenderTest {
   void sdkException() throws Exception {
     Client client = mock(Client.class);
     when(client.sendSms(any())).thenThrow(new RuntimeException("connect timeout"));
-    AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE);
+    AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE, RESET_TEMPLATE);
 
-    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456"))
+    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("connect timeout");
   }

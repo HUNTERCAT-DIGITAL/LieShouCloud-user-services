@@ -33,9 +33,19 @@ public class ProdCodeSender implements CodeSender {
 
   @Override
   public void send(VerificationCode.Channel channel, String target, String code) {
+    // 旧接口（无 purpose）：默认按登录验证码处理（向后兼容）
+    send(channel, target, code, VerificationCode.Purpose.LOGIN);
+  }
+
+  @Override
+  public void send(
+      VerificationCode.Channel channel,
+      String target,
+      String code,
+      VerificationCode.Purpose purpose) {
     switch (channel) {
       case SMS:
-        smsSender.sendSms(target, code);
+        smsSender.sendSms(target, code, purpose);
         return;
       case EMAIL:
         emailSender.sendVerificationEmail(target, code);

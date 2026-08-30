@@ -28,4 +28,18 @@ public class DevCodeSender implements CodeSender {
         target,
         code);
   }
+
+  @Override
+  public void send(
+      VerificationCode.Channel channel,
+      String target,
+      String code,
+      VerificationCode.Purpose purpose) {
+    log.info(
+        "[LSCP-CODE] channel={} target={} code={} purpose={} (dev sender - 生产环境接入短信/邮件服务商)",
+        channel,
+        target,
+        code,
+        purpose);
+  }
 }

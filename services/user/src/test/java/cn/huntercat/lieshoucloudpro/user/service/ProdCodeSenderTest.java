@@ -21,7 +21,19 @@ class ProdCodeSenderTest {
 
     sender.send(VerificationCode.Channel.SMS, "13800138000", "123456");
 
-    verify(sms).sendSms("13800138000", "123456");
+    verify(sms).sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN);
+  }
+
+  @Test
+  @DisplayName("SMS 通道 · 改密 purpose → 委托 AliyunSmsSender 带 RESET_PASSWORD")
+  void smsResetPasswordDelegates() {
+    AliyunSmsSender sms = mock(AliyunSmsSender.class);
+    SmtpEmailSender email = mock(SmtpEmailSender.class);
+    ProdCodeSender sender = new ProdCodeSender(sms, email);
+
+    sender.send(VerificationCode.Channel.SMS, "13800138000", "123456", VerificationCode.Purpose.RESET_PASSWORD);
+
+    verify(sms).sendSms("13800138000", "123456", VerificationCode.Purpose.RESET_PASSWORD);
   }
 
   @Test

@@ -11,6 +11,8 @@ import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 
+import cn.huntercat.lieshou.framework.domain.VerificationCode;
+
 /**
  * 阿里云短信发送器（生产验证码通道 · ADR-0023 Phase 2）.
  *
@@ -36,33 +38,42 @@ public class AliyunSmsSender {
   private final Client client;
   private final String signName;
   private final String templateCode;
+  private final String resetTemplateCode;
 
   public AliyunSmsSender(
       Client client,
       @Value("${ALIYUN_SMS_SIGN_NAME:}") String signName,
-      @Value("${ALIYUN_SMS_TEMPLATE_CODE:}") String templateCode) {
+      @Value("${ALIYUN_SMS_TEMPLATE_CODE:}") String templateCode,
+      @Value("${ALIYUN_SMS_TEMPLATE_RESET_CODE:}") String resetTemplateCode) {
     this.client = client;
     this.signName = signName;
     this.templateCode = templateCode;
+    this.resetTemplateCode = resetTemplateCode;
   }
 
   /**
-   * 发送短信验证码。
+   * 发送短信验证码（按 purpose 选模板：登录 → templateCode，改密/重置 → resetTemplateCode）。
    *
    * @param phone 国内手机号（11 位）
    * @param code 6 位数字验证码
    * @throws IllegalStateException 配置缺失 / 阿里云返回非 OK / 网络异常
    */
-  public void sendSms(String phone, String code) {
-    if (signName.isBlank() || templateCode.isBlank()) {
+  public void sendSms(String phone, String code, VerificationCode.Purpose purpose) {
+    // 改密/重置密码用独立模板（SMS_152461726）；未配置回退登录模板（向后兼容）
+    String tpl =
+        purpose == VerificationCode.Purpose.RESET_PASSWORD && !resetTemplateCode.isBlank()
+            ? resetTemplateCode
+            : templateCode;
+    if (signName.isBlank() || tpl.isBlank()) {
       throw new IllegalStateException(
-          "阿里云短信未完整配置：需要 ALIYUN_SMS_SIGN_NAME + ALIYUN_SMS_TEMPLATE_CODE");
+          "阿里云短信未完整配置：需要 ALIYUN_SMS_SIGN_NAME + ALIYUN_SMS_TEMPLATE_CODE"
+              + "（+ ALIYUN_SMS_TEMPLATE_RESET_CODE 用于改密）");
     }
     SendSmsRequest request =
         new SendSmsRequest()
             .setPhoneNumbers(phone)
             .setSignName(signName)
-            .setTemplateCode(templateCode)
+            .setTemplateCode(tpl)
             .setTemplateParam("{\"code\":\"" + code + "\"}");
     try {
       SendSmsResponse response = client.sendSms(request);
