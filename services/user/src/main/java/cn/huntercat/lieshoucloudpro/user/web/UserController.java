@@ -99,7 +99,7 @@ public class UserController {
   @Operation(
       summary = "Create user",
       description =
-          "Body must include username + displayName + plaintext password (will be hashed). email/phone optional.")
+          "Body must include username + displayName. password optional(未设密码首次登录用验证码激活 · 2026-08). email/phone optional.")
   @ApiResponse(responseCode = "200", description = "Created user with assigned id")
   @PostMapping
   public ResponseEntity<?> create(
@@ -292,7 +292,8 @@ public class UserController {
   public record CreateUserRequest(
       @jakarta.validation.constraints.NotBlank String username,
       @jakarta.validation.constraints.NotBlank String displayName,
-      @jakarta.validation.constraints.NotBlank String password,
+      // password 可选(2026-08):管理员建用户可不设密码,首次登录用验证码激活设置
+      String password,
       String email,
       String phone,
       String tenantCode,
