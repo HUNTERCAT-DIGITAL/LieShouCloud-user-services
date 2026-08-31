@@ -238,12 +238,13 @@ public class UserController {
     return ResponseEntity.ok(userService.authViewByTenantAndUsername(tenantCode, username));
   }
 
-  /** Phase 8: 给 auth-service 用：按手机号查鉴权视图（验证码登录 · ADR-0023）. */
-  @Operation(summary = "Get user auth view by phone (service-to-service)")
-  @GetMapping("/auth/by-phone/{phone}")
-  public ResponseEntity<UserAuthView> authByPhone(
+  /** Phase 8: 给 auth-service 用：按租户 + 手机号查鉴权视图（验证码登录 · 手机号租户内唯一 · 2026-08）. */
+  @Operation(summary = "Get user auth view by tenant + phone (service-to-service)")
+  @GetMapping("/auth/by-tenant-phone/{tenantCode}/{phone}")
+  public ResponseEntity<UserAuthView> authByTenantPhone(
+      @Parameter(description = "Tenant code", example = "default") @PathVariable String tenantCode,
       @Parameter(description = "Phone", example = "13800000000") @PathVariable String phone) {
-    return ResponseEntity.ok(userService.authViewByPhone(phone));
+    return ResponseEntity.ok(userService.authViewByTenantAndPhone(tenantCode, phone));
   }
 
   /** Phase 8: 给 auth-service 用：按邮箱查鉴权视图（验证码登录 · ADR-0023）. */
