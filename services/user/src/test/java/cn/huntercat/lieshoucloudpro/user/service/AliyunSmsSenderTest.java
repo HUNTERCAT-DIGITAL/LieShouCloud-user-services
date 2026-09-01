@@ -63,7 +63,8 @@ class AliyunSmsSenderTest {
     when(client.sendSms(any())).thenReturn(response("isv.SMS_SIGNATURE_ILLEGAL", "签名不合法"));
     AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE, RESET_TEMPLATE);
 
-    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
+    assertThatThrownBy(
+            () -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("签名不合法");
   }
@@ -74,7 +75,8 @@ class AliyunSmsSenderTest {
     Client client = mock(Client.class);
     AliyunSmsSender sender = new AliyunSmsSender(client, "", TEMPLATE, RESET_TEMPLATE);
 
-    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
+    assertThatThrownBy(
+            () -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("ALIYUN_SMS_SIGN_NAME");
   }
@@ -86,7 +88,8 @@ class AliyunSmsSenderTest {
     when(client.sendSms(any())).thenThrow(new RuntimeException("connect timeout"));
     AliyunSmsSender sender = new AliyunSmsSender(client, SIGN, TEMPLATE, RESET_TEMPLATE);
 
-    assertThatThrownBy(() -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
+    assertThatThrownBy(
+            () -> sender.sendSms("13800138000", "123456", VerificationCode.Purpose.LOGIN))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("connect timeout");
   }

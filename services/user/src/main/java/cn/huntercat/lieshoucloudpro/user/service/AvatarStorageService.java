@@ -1,21 +1,22 @@
 package cn.huntercat.lieshoucloudpro.user.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户头像存储（本地磁盘 + volume 挂载，对齐 iot PhotoStorageService 模式）.
  *
  * <p>目录结构 {@code {avatar-dir}/{tenantId}/{userId}/{uuid}.{ext}}，访问路径 {@code
- * /api/user-files/avatars/{tenantId}/{userId}/{filename}}（经网关 user-files-route 转发，文件名
- * UUID 随机不可枚举）。路径穿越防护：解析后必须仍在根目录内。
+ * /api/user-files/avatars/{tenantId}/{userId}/{filename}}（经网关 user-files-route 转发，文件名 UUID
+ * 随机不可枚举）。路径穿越防护：解析后必须仍在根目录内。
  */
 @Service
 public class AvatarStorageService {

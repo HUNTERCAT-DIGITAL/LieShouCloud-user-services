@@ -1,11 +1,5 @@
 package cn.huntercat.lieshoucloudpro.user.web;
 
-import cn.huntercat.lieshoucloudpro.user.service.AvatarStorageService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Optional;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
@@ -15,6 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import cn.huntercat.lieshoucloudpro.user.service.AvatarStorageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Optional;
 
 /**
  * 用户头像静态读取（公开 · UUID 不可枚举 · 7 天缓存）.

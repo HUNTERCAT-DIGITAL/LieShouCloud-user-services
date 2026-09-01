@@ -1,5 +1,6 @@
 package cn.huntercat.lieshoucloudpro.user.web;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -12,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,11 +25,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import cn.huntercat.lieshou.framework.common.api.BaseException;
 import cn.huntercat.lieshou.framework.common.api.ErrorCode;
 import cn.huntercat.lieshou.framework.common.dto.UserAuthView;
-import org.springframework.beans.factory.ObjectProvider;
 import cn.huntercat.lieshou.framework.common.web.GlobalExceptionHandler;
-import cn.huntercat.lieshou.framework.i18n.I18nMessages;
 import cn.huntercat.lieshou.framework.domain.Tenant;
 import cn.huntercat.lieshou.framework.domain.User;
+import cn.huntercat.lieshou.framework.i18n.I18nMessages;
 import cn.huntercat.lieshou.framework.service.AuditService;
 import cn.huntercat.lieshou.framework.service.UserService;
 import java.util.List;
@@ -106,6 +108,36 @@ class UserControllerTest {
         .andExpect(jsonPath("$.username").value("admin"))
         .andExpect(jsonPath("$.tenantCode").value("huntercat"))
         .andExpect(jsonPath("$.tenantEdition").value("GENERIC"));
+  }
+
+  @Test
+  void create_无密码生成随机密码_手机验证码激活() throws Exception {
+    User u = user();
+    u.setPasswordHash("hash");
+    when(userService.create(any(), any(), any(), any(), any(), any(), any(), any()))
+        .thenReturn(new UserService.CreateResult(u, tenant()));
+
+    mockMvc
+        .perform(
+            post("/api/users")
+                .header("X-Tenant-Id", "1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    "{\"username\":\"zzy\",\"displayName\":\"张春芸\",\"phone\":\"15979095058\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.username").value("admin"));
+
+    // 密码兜底：传给 create 的 password 非空（随机强密码，非用户输入）
+    verify(userService)
+        .create(
+            eq("zzy"),
+            eq("张春芸"),
+            org.mockito.ArgumentMatchers.argThat(p -> p != null && p.length() >= 8),
+            eq(null),
+            eq("15979095058"),
+            eq(null),
+            eq(null),
+            eq(1L));
   }
 
   @Test

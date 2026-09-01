@@ -1,5 +1,7 @@
 package cn.huntercat.lieshoucloudpro.user.service;
 
+import org.springframework.beans.factory.ObjectProvider;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cn.huntercat.lieshou.framework.domain.VerificationCode;
-import org.springframework.beans.factory.ObjectProvider;
 
 /** ProdCodeSender 通道分发单元测试（SMS → 阿里云 / EMAIL → SMTP）. */
 @DisplayName("ProdCodeSender（生产通道分发）")
@@ -40,7 +41,11 @@ class ProdCodeSenderTest {
     SmtpEmailSender email = mock(SmtpEmailSender.class);
     ProdCodeSender sender = newSender(sms, email);
 
-    sender.send(VerificationCode.Channel.SMS, "13800138000", "123456", VerificationCode.Purpose.RESET_PASSWORD);
+    sender.send(
+        VerificationCode.Channel.SMS,
+        "13800138000",
+        "123456",
+        VerificationCode.Purpose.RESET_PASSWORD);
 
     verify(sms).sendSms("13800138000", "123456", VerificationCode.Purpose.RESET_PASSWORD);
   }

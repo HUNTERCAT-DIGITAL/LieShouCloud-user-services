@@ -111,7 +111,7 @@ public class UserController {
         userService.create(
             body.username(),
             body.displayName(),
-            body.password(),
+            resolvePassword(body.password()),
             body.email(),
             body.phone(),
             body.tenantCode(),
@@ -273,6 +273,24 @@ public class UserController {
   private ResponseEntity<Object> forbidden() {
     return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
         .body(Map.of("error", "FORBIDDEN"));
+  }
+
+  /** 密码兜底（对齐前端契约：管理员建用户可不设密码，首次登录用手机验证码激活）： 空 → 生成随机强密码（满足 ≥8 位含字母数字，用户不知，仅验证码可登录）。 */
+  private static String resolvePassword(String password) {
+    if (password != null && !password.isBlank()) {
+      return password;
+    }
+    StringBuilder sb = new StringBuilder(16);
+    String letters = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz";
+    String digits = "23456789";
+    java.util.Random r = new java.security.SecureRandom();
+    for (int i = 0; i < 8; i++) {
+      sb.append(letters.charAt(r.nextInt(letters.length())));
+    }
+    for (int i = 0; i < 8; i++) {
+      sb.append(digits.charAt(r.nextInt(digits.length())));
+    }
+    return sb.toString();
   }
 
   /** X-User-Id header → Long（gateway 从 JWT uid 注入）；空/非法 → null */

@@ -1,5 +1,6 @@
 package cn.huntercat.lieshoucloudpro.user.web;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,10 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import cn.huntercat.lieshou.framework.common.api.BaseException;
-import org.springframework.beans.factory.ObjectProvider;
 import cn.huntercat.lieshou.framework.common.web.GlobalExceptionHandler;
-import cn.huntercat.lieshou.framework.i18n.I18nMessages;
 import cn.huntercat.lieshou.framework.domain.TenantInvite;
+import cn.huntercat.lieshou.framework.i18n.I18nMessages;
 import cn.huntercat.lieshou.framework.service.TenantInviteService;
 
 /**

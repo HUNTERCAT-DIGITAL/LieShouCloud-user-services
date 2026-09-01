@@ -35,10 +35,7 @@ public class AliyunSmsSender {
   private final String resetTemplateCode;
 
   public AliyunSmsSender(
-      Client client,
-      String signName,
-      String templateCode,
-      String resetTemplateCode) {
+      Client client, String signName, String templateCode, String resetTemplateCode) {
     this.client = client;
     this.signName = signName;
     this.templateCode = templateCode;
