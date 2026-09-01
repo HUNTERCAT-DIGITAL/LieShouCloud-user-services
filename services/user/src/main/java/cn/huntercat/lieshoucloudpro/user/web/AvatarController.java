@@ -80,5 +80,23 @@ public class AvatarController {
     return ResponseEntity.ok(Map.of("avatarUrl", saved.getAvatarUrl() == null ? "" : saved.getAvatarUrl()));
   }
 
+  @Operation(summary = "直接设置头像 URL（默认头像 data URL / 内置标识 · 2026-09）")
+  @org.springframework.web.bind.annotation.PatchMapping("/{id}/avatar-url")
+  public ResponseEntity<?> setAvatarUrl(
+      @PathVariable Long id,
+      @RequestHeader(value = "X-Tenant-Id", required = false) String tenantHeader,
+      @RequestBody Map<String, String> body) {
+    Long tid = TenantHeaders.parseLong(tenantHeader);
+    String url = body == null ? null : body.get("avatarUrl");
+    if (url == null || url.isBlank()) {
+      return ResponseEntity.badRequest().body(Map.of("error", "AVATAR_URL_REQUIRED"));
+    }
+    if (url.length() > 2048) {
+      return ResponseEntity.badRequest().body(Map.of("error", "AVATAR_URL_TOO_LONG"));
+    }
+    User saved = userService.setAvatarUrl(id, tid, url);
+    return ResponseEntity.ok(Map.of("avatarUrl", saved.getAvatarUrl()));
+  }
+
 
 }
