@@ -22,7 +22,7 @@ public class AvatarStorageService {
 
   private final Path root;
 
-  public AvatarStorageService(@Value("${user.avatar-dir:./data/avatars}") String dir) {
+  public AvatarStorageService(@Value("${user.avatar-dir:/data/avatars}") String dir) {
     this.root = Paths.get(dir).toAbsolutePath().normalize();
   }
 

@@ -17,6 +17,9 @@ WORKDIR /app
 
 COPY --from=builder /workspace/services/user/target/lieshoucloud-user.jar /app/app.jar
 
+# 用户头像目录（2026-09 · compose 挂 dwjk-user-avatars volume，首次挂载继承此所有权）
+RUN mkdir -p /data/avatars && chown -R app:app /data/avatars
+
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -Dfile.encoding=UTF-8"
 USER app
 
